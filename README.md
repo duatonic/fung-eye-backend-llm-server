@@ -12,7 +12,11 @@ Next, make sure you have ollama installed and then run this command to pull the 
 ollama pull gemma3:4b-it-qat
 ```
 
-Finally, run the server by running the script.
+Finally, run ollama then run the server by running the script.
+```
+ollama serve
+```
+
 ```
 python app.py
 ```
