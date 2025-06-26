@@ -9,14 +9,15 @@ app = Flask(__name__)
 
 jobs = {}
 
-CLASSIFICATION_MODEL = 'gemma3:4b-it-qat'
-MAIN_MODEL = 'gemma3:4b-it-qat'
+PROMPT_CLASSIFICATION_MODEL = 'gemma3:4b-it-qat'
+CHATBOT_MODEL = 'gemma3:4b-it-qat'
+IMAGE_IDENTIFICATION_MODEL = 'gemma3:4b-it-qat'
 
 OUT_OF_SCOPE_RESPONSE = "Aku adalah FungiMate, asistenmu dalam ilmu jamur. Aku hanya bisa menjawab pertanyaan tentang jamur. Bagaimana aku bisa membantumu dengan topik ilmu jamur?"
 
 def classify_user_prompt(user_content):
     # Prompt Classification
-    print(f"--- Classifying prompt with {CLASSIFICATION_MODEL}... ---")
+    print(f"--- Classifying prompt with {PROMPT_CLASSIFICATION_MODEL}... ---")
     try:
         classification_prompt = f"""
         Is the following user question related to mycology (the study of fungi, mushrooms, yeasts, or molds)? 
@@ -27,7 +28,7 @@ def classify_user_prompt(user_content):
         Your Answer (YES or NO):
         """
         response = ollama.chat(
-            model=CLASSIFICATION_MODEL,
+            model=PROMPT_CLASSIFICATION_MODEL,
             messages=[{'role': 'user', 'content': classification_prompt}]
         )
         decision = response['message']['content'].strip().upper()
@@ -44,7 +45,7 @@ def process_chat_message(job_id, user_message_content):
     is_mycology_related = classify_user_prompt(user_message_content)
     
     if is_mycology_related:
-        print(f"--- Prompt is on scope. Querying {MAIN_MODEL}... ---")
+        print(f"--- Prompt is on scope. Querying {CHATBOT_MODEL}... ---")
         try:
             print(f"--- Processing Prompt: '{user_message_content}' ---")
             # Prompt Engineering
@@ -68,7 +69,7 @@ def process_chat_message(job_id, user_message_content):
             **Your Formatted Response:**
             """
             response = ollama.chat(
-                model=MAIN_MODEL, 
+                model=CHATBOT_MODEL, 
                 messages=[{'role': 'user', 'content': structured_prompt}]
             )
             jobs[job_id]['status'] = 'complete'
@@ -95,7 +96,7 @@ def process_image_identification(job_id, base64_image):
         image_bytes = base64.b64decode(base64_image)
 
         response = ollama.chat(
-            model = MAIN_MODEL,
+            model = IMAGE_IDENTIFICATION_MODEL,
             messages = [
                 {
                     'role': 'user',
@@ -174,6 +175,7 @@ def get_chat_result(job_id):
 
 if __name__ == "__main__":
     print("Starting Flask server with mycology guardrail and structured prompting...")
-    print(f"Classification Model: {CLASSIFICATION_MODEL}")
-    print(f"Main Answering Model: {MAIN_MODEL}")
+    print(f"Prompt Classification Model: {PROMPT_CLASSIFICATION_MODEL}")
+    print(f"Chatbot Model: {CHATBOT_MODEL}")
+    print(f"Image Identifier Model: {IMAGE_IDENTIFICATION_MODEL}")
     app.run(host='127.0.0.1', port=5000, debug=True)
