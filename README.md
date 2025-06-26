@@ -1,6 +1,8 @@
 # fung-eye-backend-llm-server
 Backend LLM Server for [FungEye](https://github.com/duatonic/fung-eye.git).
 
+This server utilizes `gemma3:4b-it-qat` as the image identifier and the chatbot. You can configure the model used for each feature in the script.
+
 To run the server, run this command to install the requirements.
 ```
 pip install Flask ollama
